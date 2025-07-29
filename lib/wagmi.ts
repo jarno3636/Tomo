@@ -8,7 +8,7 @@ import { ReactNode } from 'react'
 
 const config = getDefaultConfig({
   appName: 'Tomagotchu',
-  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID', // optional, get from cloud.walletconnect.com
+  projectId: '8d389a211728bfed10834a260898662e', // optional, get from cloud.walletconnect.com
   chains: [base],
   transports: {
     [base.id]: http()
