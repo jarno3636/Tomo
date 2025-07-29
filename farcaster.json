@@ -1,0 +1,13 @@
+{
+  "name": "Tomagotchu",
+  "description": "Mint your on-chain Tomagotchu NFT and share it on Farcaster!",
+  "icon": "https://tomagotchu.xyz/favicon.ico",
+  "url": "https://tomagotchu.xyz", 
+  "developer": {
+    "name": "Tomagotchu Labs",
+    "url": "https://farcaster.xyz/~/channel/toby"
+  },
+  "app": {
+    "type": "miniapp"
+  }
+}
