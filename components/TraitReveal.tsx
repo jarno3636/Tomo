@@ -1,31 +1,45 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
-import ShareButton from './ShareButton'
+import { SITE_URL } from '@/lib/constants'
 
 type Props = {
   tokenId: number
 }
 
 export default function TraitReveal({ tokenId }: Props) {
-  const traits = getTraits(tokenId)
-  const image = generateImage(traits)
+  const [image, setImage] = useState<string | null>(null)
+  const [traits, setTraits] = useState<ReturnType<typeof getTraits> | null>(null)
+
+  useEffect(() => {
+    const t = getTraits(tokenId)
+    setTraits(t)
+    const svg = generateImage(t)
+    setImage(svg)
+  }, [tokenId])
+
+  if (!traits || !image) return null
 
   return (
-    <div className="mt-8 w-full max-w-md text-center">
-      <h2 className="text-2xl font-bold mb-2">You minted Tomagotchu #{tokenId}</h2>
-      <img
-        src={`data:image/svg+xml;utf8,${encodeURIComponent(image)}`}
-        alt="Tomagotchu Image"
-        className="w-full rounded shadow-lg my-4"
+    <div className="text-center mt-6">
+      <div
+        className="mx-auto w-[250px] h-[250px] border shadow bg-white p-2"
+        dangerouslySetInnerHTML={{ __html: image }}
       />
-      <ul className="text-left text-lg mb-4">
-        <li><strong>Color:</strong> {traits.color.name} ({traits.color.rarity})</li>
-        <li><strong>Shape:</strong> {traits.shape.name} ({traits.shape.rarity})</li>
-        <li><strong>Animal:</strong> {traits.animal.name} ({traits.animal.rarity})</li>
-      </ul>
-      <ShareButton tokenId={tokenId} />
+      <h2 className="text-xl font-bold mt-2">Tomagotchu #{tokenId}</h2>
+      <p className="text-sm text-gray-600">
+        {traits.color.name} • {traits.shape.name} • {traits.animal.name}
+      </p>
+      <a
+        href={`${SITE_URL}/frame/${tokenId}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 inline-block text-blue-600 underline"
+      >
+        View Frame ↗
+      </a>
     </div>
   )
 }
