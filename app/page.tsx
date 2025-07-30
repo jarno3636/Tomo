@@ -7,9 +7,10 @@ import { InjectedConnector } from 'wagmi/connectors/injected'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import MintButton from '@/components/MintButton'
 import TraitReveal from '@/components/TraitReveal'
+import { WALLETCONNECT_PROJECT_ID } from '@/lib/constants'
 
 export default function HomePage() {
-  const { address, isConnected } = useAccount()
+  const { isConnected } = useAccount()
   const [tokenId, setTokenId] = useState<number | null>(null)
 
   return (
@@ -32,8 +33,8 @@ function Connect() {
   const { connect, connectors, isLoading, error } = useConnect({
     connectors: [
       new InjectedConnector(),
-      new WalletConnectConnector({ options: { projectId: 'YOUR_PROJECT_ID' } }),
-    ]
+      new WalletConnectConnector({ options: { projectId: WALLETCONNECT_PROJECT_ID } }),
+    ],
   })
 
   return (
