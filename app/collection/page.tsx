@@ -1,58 +1,56 @@
-// app/collection/page.tsx
-"use client";
+'use client'
 
-import { useAccount } from "wagmi";
-import { useEffect, useState } from "react";
-import { readContract } from "@wagmi/core";
-import { TomagotchuABI } from "../../lib/TomagotchuABI";
-import { generateTraitsFromSeed } from "../../utils/generateTraits";
-import { CONTRACT_ADDRESS } from "@/constants";
-import Image from "next/image";
+import { useAccount } from 'wagmi'
+import { useEffect, useState } from 'react'
+import { readContract } from '@wagmi/core'
+import Image from 'next/image'
+
+// ABI should live in lib/TomagotchuABI.ts and be a default export
+import TomagotchuABI from '@/lib/TomagotchuABI'
+
+// Your constants file is in lib/constants.ts
+import { CONTRACT_ADDRESS } from '@/lib/constants'
+
+// Generate trait names/rarity from on‑chain numbers
+import { generateTraits } from '@/lib/traits'
 
 type NFT = {
-  tokenId: number;
-  traits: {
-    color: number;
-    shape: number;
-    animal: number;
-  };
-  rarity: {
-    color: string;
-    shape: string;
-    animal: string;
-  };
-};
+  tokenId: number
+  traits: { color: number; shape: number; animal: number }
+  rarity: { color: string; shape: string; animal: string }
+}
 
 export default function CollectionPage() {
-  const { address, isConnected } = useAccount();
-  const [nfts, setNfts] = useState<NFT[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { address, isConnected } = useAccount()
+  const [nfts, setNfts] = useState<NFT[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!address) return;
-    const fetchNFTs = async () => {
-      setLoading(true);
-      const results: NFT[] = [];
+    if (!isConnected || !address) return
+    setLoading(true)
 
-      try {
-        // Estimate: loop through 0–9999 to find tokens owned by user
-        for (let tokenId = 0; tokenId < 10000; tokenId++) {
-          const owner: string = await readContract({
-            abi: TomagotchuABI,
+    ;(async () => {
+      const results: NFT[] = []
+      for (let tokenId = 0; tokenId < 10000; tokenId++) {
+        try {
+          const owner = await readContract({
             address: CONTRACT_ADDRESS,
-            functionName: "ownerOf",
-            args: [tokenId],
-          });
+            abi: TomagotchuABI,
+            functionName: 'ownerOf',
+            args: [tokenId]
+          })
 
-          if (owner.toLowerCase() === address.toLowerCase()) {
-            const traits = await readContract({
-              abi: TomagotchuABI,
+          if (String(owner).toLowerCase() === address.toLowerCase()) {
+            // generateTraits returns { color, shape, animal }
+            const { color, shape, animal } = await readContract({
               address: CONTRACT_ADDRESS,
-              functionName: "generateTraits",
-              args: [tokenId, address],
-            });
+              abi: TomagotchuABI,
+              functionName: 'generateTraits',
+              args: [tokenId, address]
+            }) as { color: number; shape: number; animal: number }
 
-            const [color, shape, animal] = traits as [number, number, number];
+            // convert numeric trait to rarity string
+            const getRarity = (t: number) => (t < 6 ? 'common' : t < 9 ? 'rare' : 'legendary')
 
             results.push({
               tokenId,
@@ -60,33 +58,18 @@ export default function CollectionPage() {
               rarity: {
                 color: getRarity(color),
                 shape: getRarity(shape),
-                animal: getRarity(animal),
-              },
-            });
+                animal: getRarity(animal)
+              }
+            })
           }
+        } catch {
+          // skip non‑existent tokens
         }
-      } catch (err) {
-        console.error("Error fetching NFTs", err);
       }
-
-      setNfts(results);
-      setLoading(false);
-    };
-
-    fetchNFTs();
-  }, [address]);
-
-  const getRarity = (trait: number) => {
-    if (trait < 6) return "common";
-    else if (trait < 9) return "rare";
-    else return "legendary";
-  };
-
-  const rarityEmoji = {
-    common: "🔹",
-    rare: "🔸",
-    legendary: "🌟",
-  };
+      setNfts(results)
+      setLoading(false)
+    })()
+  }, [address, isConnected])
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -107,22 +90,16 @@ export default function CollectionPage() {
               <div className="mb-2 font-semibold">Token #{nft.tokenId}</div>
               <div className="text-sm space-y-1">
                 <div>
-                  🎨 Color: {nft.traits.color}{" "}
-                  <span className="ml-2">
-                    {rarityEmoji[nft.rarity.color]} {nft.rarity.color}
-                  </span>
+                  🎨 Color: {nft.traits.color}{' '}
+                  <span className="ml-2">{nft.rarity.color}</span>
                 </div>
                 <div>
-                  🔷 Shape: {nft.traits.shape}{" "}
-                  <span className="ml-2">
-                    {rarityEmoji[nft.rarity.shape]} {nft.rarity.shape}
-                  </span>
+                  🔷 Shape: {nft.traits.shape}{' '}
+                  <span className="ml-2">{nft.rarity.shape}</span>
                 </div>
                 <div>
-                  🐾 Animal: {nft.traits.animal}{" "}
-                  <span className="ml-2">
-                    {rarityEmoji[nft.rarity.animal]} {nft.rarity.animal}
-                  </span>
+                  🐾 Animal: {nft.traits.animal}{' '}
+                  <span className="ml-2">{nft.rarity.animal}</span>
                 </div>
               </div>
             </div>
@@ -130,5 +107,5 @@ export default function CollectionPage() {
         </div>
       )}
     </div>
-  );
+  )
 }
