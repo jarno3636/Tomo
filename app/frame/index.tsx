@@ -1,27 +1,27 @@
 // app/frame/index.tsx
-import Image from 'next/image'
-import Link from 'next/link'
 
-export default function FrameLanding() {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center bg-gradient-to-b from-white to-violet-100">
-      <h1 className="text-4xl font-bold mb-4">🎉 Tomagotchu Frames</h1>
-      <p className="mb-6 text-lg text-gray-700 max-w-md">
-        Every Tomagotchu NFT has a unique Farcaster Frame. Mint one, then share your collectible with a dynamic cast image.
-      </p>
-      <Image
-        src="/og/tomagotchu-og.png"
-        alt="Tomagotchu"
-        width={600}
-        height={314}
-        className="rounded shadow-md mb-6"
-      />
-      <Link
-        href="/mint"
-        className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded transition"
-      >
-        Mint a Tomagotchu 🐸
-      </Link>
-    </div>
-  )
+import { NextResponse } from 'next/server'
+import { getTraits } from '@/lib/traits'
+import { generateImage } from '@/lib/generateImage'
+
+export const dynamic = 'force-dynamic'
+
+export async function GET() {
+  const tokenId = Math.floor(Math.random() * 10000)
+  const traits = getTraits(tokenId)
+  const imageSvg = generateImage(traits)
+  const imageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(imageSvg)}`
+
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html',
+      'Cache-Control': 'no-cache',
+      'Refresh': '0; url=/frame/' + tokenId,
+      'Location': '/frame/' + tokenId,
+      'Frame-Image': imageUrl,
+      'Frame-Post-Url': `https://tomagotchu.xyz/frame/${tokenId}`,
+      'Frame-Button-Text': 'Mint One!',
+    }
+  })
 }
