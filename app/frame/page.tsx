@@ -7,7 +7,7 @@ import { FRAME_BUTTONS, SITE_URL } from '@/lib/constants'
 type Params = { params: { id: string } }
 
 export async function generateMetadata({ params }: Params) {
-  const id = parseInt(params.id)
+  const id = parseInt(params.id, 10)
   if (isNaN(id)) return notFound()
 
   const traits = getTraits(id)
@@ -30,17 +30,17 @@ export async function generateMetadata({ params }: Params) {
       'fc:frame:image': svgUrl,
       'fc:frame:button:1': FRAME_BUTTONS[0].label,
       'fc:frame:button:1:action': FRAME_BUTTONS[0].action,
-      'fc:frame:button:1:target': FRAME_BUTTONS[0].target,
+      'fc:frame:button:1:target': `${SITE_URL}${FRAME_BUTTONS[0].target}`,
       'fc:frame:button:2': FRAME_BUTTONS[1].label,
       'fc:frame:button:2:action': FRAME_BUTTONS[1].action,
-      'fc:frame:button:2:target': FRAME_BUTTONS[1].target,
+      'fc:frame:button:2:target': `${SITE_URL}${FRAME_BUTTONS[1].target}`,
       'fc:frame:post_url': `${SITE_URL}/mint`
     }
   }
 }
 
 export default function FramePage({ params }: Params) {
-  const id = parseInt(params.id)
+  const id = parseInt(params.id, 10)
   const traits = getTraits(id)
   const image = generateImage(traits)
 
