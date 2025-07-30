@@ -1,0 +1,13 @@
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  @apply bg-gray-50 text-gray-800;
+}
+
+button {
+  @apply transition active:scale-95 focus:outline-none;
+}
