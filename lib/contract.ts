@@ -1,33 +1,37 @@
 // lib/contract.ts
+
+/**
+ * The raw Tomagotchu contract definition (for Viem)
+ */
 export const TOMAGOTCHU_CONTRACT = {
   address: "0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2",
   abi: [
     {
       inputs: [],
+      name: "mint",
       stateMutability: "payable",
       type: "function",
-      name: "mint"
     },
     {
       inputs: [
         { internalType: "uint256", name: "tokenId", type: "uint256" },
-        { internalType: "address", name: "user", type: "address" }
+        { internalType: "address", name: "user", type: "address" },
       ],
       name: "generateTraits",
       outputs: [
         { internalType: "uint8", name: "", type: "uint8" },
         { internalType: "uint8", name: "", type: "uint8" },
-        { internalType: "uint8", name: "", type: "uint8" }
+        { internalType: "uint8", name: "", type: "uint8" },
       ],
       stateMutability: "pure",
-      type: "function"
+      type: "function",
     },
     {
       inputs: [],
       name: "totalMinted",
       outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
       stateMutability: "view",
-      type: "function"
+      type: "function",
     },
     {
       anonymous: false,
@@ -36,10 +40,18 @@ export const TOMAGOTCHU_CONTRACT = {
         { indexed: true, internalType: "uint256", name: "tokenId", type: "uint256" },
         { indexed: false, internalType: "uint8", name: "color", type: "uint8" },
         { indexed: false, internalType: "uint8", name: "shape", type: "uint8" },
-        { indexed: false, internalType: "uint8", name: "animal", type: "uint8" }
+        { indexed: false, internalType: "uint8", name: "animal", type: "uint8" },
       ],
       name: "TomagotchuMinted",
-      type: "event"
-    }
-  ]
+      type: "event",
+    },
+  ],
+}
+
+/**
+ * A convenient config object for Wagmi/Core pages (readContract, writeContract, etc.)
+ */
+export const contractConfig = {
+  address: TOMAGOTCHU_CONTRACT.address,
+  abi: TOMAGOTCHU_CONTRACT.abi,
 }
