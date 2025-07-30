@@ -1,4 +1,4 @@
-// app/api/frame/[id]/route.ts
+// app/api/frame/[id]/route.tsx
 import { ImageResponse } from 'next/og'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
