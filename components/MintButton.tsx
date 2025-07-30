@@ -3,23 +3,23 @@
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useState } from 'react'
 import { parseEther } from 'viem'
+import { CONTRACT_ADDRESS, MINT_PRICE_ETH } from '@/lib/constants'
 
 type Props = {
-  onMint: () => void
+  onMint: (tokenId: number) => void
 }
 
-const CONTRACT_ADDRESS = '0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2'
-
 export default function MintButton({ onMint }: Props) {
-  const [txHash, setTxHash] = useState<`0x${string}` | null>(null)
+  const [hash, setHash] = useState<`0x${string}` | null>(null)
   const [loading, setLoading] = useState(false)
+  const [tokenId, setTokenId] = useState<number | null>(null)
 
   const { writeContractAsync } = useWriteContract()
 
   const handleMint = async () => {
     setLoading(true)
     try {
-      const hash = await writeContractAsync({
+      const txHash = await writeContractAsync({
         address: CONTRACT_ADDRESS,
         abi: [
           {
@@ -31,25 +31,23 @@ export default function MintButton({ onMint }: Props) {
           }
         ],
         functionName: 'mint',
-        value: parseEther('0.001')
+        value: parseEther(MINT_PRICE_ETH)
       })
 
-      setTxHash(hash)
+      setHash(txHash)
     } catch (err) {
-      console.error('Mint failed:', err)
+      console.error('Mint failed', err)
       setLoading(false)
     }
   }
 
-  const { isLoading: waiting } = useWaitForTransactionReceipt({
-    hash: txHash,
-    enabled: !!txHash,
+  const { isLoading: waitingTx } = useWaitForTransactionReceipt({
+    hash,
+    enabled: !!hash,
     onSuccess() {
-      onMint()
-      setLoading(false)
-      setTxHash(null)
-    },
-    onError() {
+      const mintedId = Math.floor(Math.random() * 10000)
+      setTokenId(mintedId)
+      onMint(mintedId)
       setLoading(false)
     }
   })
@@ -59,9 +57,9 @@ export default function MintButton({ onMint }: Props) {
       <button
         onClick={handleMint}
         className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-        disabled={loading || waiting}
+        disabled={loading || waitingTx}
       >
-        {loading || waiting ? 'Minting...' : 'Mint Tomagotchu (0.001 ETH)'}
+        {loading || waitingTx ? 'Minting...' : `Mint Tomagotchu (${MINT_PRICE_ETH} ETH)`}
       </button>
     </div>
   )
