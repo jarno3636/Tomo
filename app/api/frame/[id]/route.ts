@@ -4,25 +4,17 @@ import { generateImage } from '@/lib/generateImage'
 
 export const runtime = 'edge'
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(_req: Request, { params }: { params: { id: string } }) {
   const tokenId = parseInt(params.id, 10)
   if (isNaN(tokenId)) {
     return new Response('Invalid token ID', { status: 400 })
   }
 
-  // build the exact same SVG string you use elsewhere
-  const traits = getTraits(tokenId)
-  const svg = generateImage(traits)
+  // 1) Generate the SVG string
+  const svg = generateImage(getTraits(tokenId))
 
+  // 2) Return it as a proper SVG response
   return new Response(svg, {
-    status: 200,
-    headers: {
-      'Content-Type': 'image/svg+xml; charset=utf-8',
-      // cache for 5m on the edge
-      'Cache-Control': 'public, max-age=300'
-    }
+    headers: { 'Content-Type': 'image/svg+xml; charset=utf-8' }
   })
 }
