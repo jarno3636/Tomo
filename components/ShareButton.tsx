@@ -1,17 +1,17 @@
 'use client'
 
-import { useEffect } from 'react'
-
 type Props = {
   tokenId: number
 }
 
 export default function ShareButton({ tokenId }: Props) {
-  const shareText = `I just minted Tomagotchu #${tokenId}! 🐸✨\n\nTry it yourself: tomagotchu.xyz`
+  const shareText = `I just minted Tomagotchu #${tokenId}! 🐸✨\n\nMint yours: https://tomagotchu.xyz\n\n#Tomagotchu #OnChainNFT #Farcaster`
 
   const handleClick = () => {
     const castUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`
-    window.open(castUrl, '_blank')
+    if (typeof window !== 'undefined') {
+      window.open(castUrl, '_blank')
+    }
   }
 
   return (
