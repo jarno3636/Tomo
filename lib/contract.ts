@@ -1,10 +1,8 @@
-// lib/contract.ts
-
 /**
  * The raw Tomagotchu contract definition (for Viem)
  */
 export const TOMAGOTCHU_CONTRACT = {
-  address: "0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2",
+  address: "0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2" as `0x${string}`,
   abi: [
     {
       inputs: [],
@@ -34,6 +32,13 @@ export const TOMAGOTCHU_CONTRACT = {
       type: "function",
     },
     {
+      inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],
+      name: "ownerOf",
+      outputs: [{ internalType: "address", name: "", type: "address" }],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
       anonymous: false,
       inputs: [
         { indexed: true, internalType: "address", name: "owner", type: "address" },
@@ -46,7 +51,7 @@ export const TOMAGOTCHU_CONTRACT = {
       type: "event",
     },
   ],
-}
+} as const
 
 /**
  * A convenient config object for Wagmi/Core pages (readContract, writeContract, etc.)
@@ -54,4 +59,4 @@ export const TOMAGOTCHU_CONTRACT = {
 export const contractConfig = {
   address: TOMAGOTCHU_CONTRACT.address,
   abi: TOMAGOTCHU_CONTRACT.abi,
-}
+} as const
