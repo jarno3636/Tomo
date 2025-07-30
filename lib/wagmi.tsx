@@ -2,9 +2,9 @@
 'use client'
 
 import React, { ReactNode } from 'react'
-import { WagmiConfig, createConfig, configureChains } from 'wagmi'
+import { createConfig, configureChains, WagmiConfig } from 'wagmi'
 import { mainnet } from 'viem/chains'
-import { publicProvider } from 'wagmi/providers/public'
+import { publicProvider } from '@wagmi/core/providers/public'
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -15,7 +15,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   [publicProvider()]
 )
 
-// 2. Create wagmi config
+// 2. Create the wagmi config
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
@@ -29,10 +29,10 @@ const wagmiConfig = createConfig({
   webSocketPublicClient
 })
 
-// 3. React Query client
+// 3. React‑Query client
 const queryClient = new QueryClient()
 
-// 4. Provider wrapper
+// 4. Provider wrapper for your app
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiConfig config={wagmiConfig}>
