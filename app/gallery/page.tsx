@@ -1,8 +1,8 @@
 // app/gallery/page.tsx
 'use client'
 
-import { getTraits } from '@/lib/traits'
-import { generateImage } from '@/lib/generateImage'
+import { getTraits } from '../../lib/traits'
+import { generateImage } from '../../lib/generateImage'
 
 export default function GalleryPage() {
   const items = Array.from({ length: 200 }, (_, i) => i)
