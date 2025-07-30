@@ -1,31 +1,42 @@
-// app/frame/[id]/route.ts
-
+// app/api/frame/[id]/route.ts
+import { ImageResponse } from 'next/og'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
-import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-dynamic'
+export const runtime = 'edge'
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
   const tokenId = parseInt(params.id)
-  if (isNaN(tokenId)) {
-    return NextResponse.json({ error: 'Invalid token ID' }, { status: 400 })
-  }
+  if (isNaN(tokenId)) return new Response('Invalid token ID', { status: 400 })
 
   const traits = getTraits(tokenId)
-  const imageSvg = generateImage(traits)
-  const imageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(imageSvg)}`
+  const svg = generateImage(traits)
 
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html',
-      'Frame-Image': imageUrl,
-      'Frame-Post-Url': `https://tomagotchu.xyz/mint`,
-      'Frame-Button-Text': 'Mint Yours!',
-    }
-  })
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: 600,
+          height: 400,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#fff',
+          fontSize: 24,
+          fontFamily: 'monospace',
+        }}
+      >
+        <div
+          dangerouslySetInnerHTML={{ __html: svg }}
+          style={{ width: 200, height: 200 }}
+        />
+        <p style={{ marginTop: 20 }}>Tomagotchu #{tokenId}</p>
+      </div>
+    ),
+    { width: 600, height: 400 }
+  )
 }
