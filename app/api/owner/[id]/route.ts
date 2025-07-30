@@ -1,28 +1,20 @@
+// app/api/owner/[id]/route.ts
 import { NextResponse } from 'next/server'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
-import { TOMAGOTCHU_ADDRESS, TOMAGOTCHU_ABI } from '@/lib/contracts'
+import { TOMAGOTCHU_CONTRACT } from '@/lib/contract'
 
-const publicClient = createPublicClient({
+const client = createPublicClient({
   chain: mainnet,
   transport: http()
 })
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
-  const tokenId = BigInt(params.id)
-  if (isNaN(Number(tokenId))) {
-    return NextResponse.json({ error: 'Invalid token ID' }, { status: 400 })
-  }
-
-  const owner = await publicClient.readContract({
-    address: TOMAGOTCHU_ADDRESS,
-    abi: TOMAGOTCHU_ABI,
+export async function GET(_: Request, { params }: { params: { id: string } }) {
+  const owner = await client.readContract({
+    address: TOMAGOTCHU_CONTRACT.address,
+    abi: TOMAGOTCHU_CONTRACT.abi,
     functionName: 'ownerOf',
-    args: [tokenId]
+    args: [BigInt(params.id)]
   })
-
-  return NextResponse.json({ owner: String(owner) })
+  return NextResponse.json({ owner })
 }
