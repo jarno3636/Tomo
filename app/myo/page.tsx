@@ -1,74 +1,58 @@
-"use client";
+'use client'
 
-import { useAccount, usePublicClient } from "wagmi";
-import { useEffect, useState } from "react";
-import { getTraitsFor } from "@/lib/tomagotchu";
-import { formatEther } from "viem";
-import { TOMAGOTCHU_CONTRACT } from "@/lib/contract";
+import { useEffect, useState } from 'react'
+import { useAccount } from 'wagmi'
+import { contractConfig } from '@/lib/contract'
+import { readContract } from '@wagmi/core'
+import { generateTraits } from '@/lib/traits'
 
-export default function MyTomagotchus() {
-  const { address } = useAccount();
-  const client = usePublicClient();
-  const [traitsList, setTraitsList] = useState<
-    { tokenId: bigint; color: number; shape: number; animal: number }[]
-  >([]);
+export default function MyCollectionPage() {
+  const { address, isConnected } = useAccount()
+  const [tokenIds, setTokenIds] = useState<number[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const fetch = async () => {
-      if (!client || !address) return;
+    const fetchTokens = async () => {
+      if (!address || !isConnected) return
+      setLoading(true)
 
-      const logs = await client.getLogs({
-        address: TOMAGOTCHU_CONTRACT.address,
-        event: {
-          type: "event",
-          name: "TomagotchuMinted",
-          inputs: [
-            { indexed: true, type: "address", name: "owner" },
-            { indexed: true, type: "uint256", name: "tokenId" },
-            { indexed: false, type: "uint8", name: "color" },
-            { indexed: false, type: "uint8", name: "shape" },
-            { indexed: false, type: "uint8", name: "animal" }
-          ]
-        },
-        fromBlock: "earliest",
-        toBlock: "latest"
-      });
+      const promises = []
+      for (let i = 0; i < 10000; i++) {
+        promises.push(
+          readContract({
+            ...contractConfig,
+            functionName: 'ownerOf',
+            args: [BigInt(i)],
+          }).then(owner => ({ id: i, owner })).catch(() => null)
+        )
+      }
 
-      const owned = logs
-        .filter(log => log.args?.owner?.toLowerCase() === address.toLowerCase())
-        .map(log => ({
-          tokenId: BigInt(log.args!.tokenId as string),
-          color: log.args!.color as number,
-          shape: log.args!.shape as number,
-          animal: log.args!.animal as number
-        }));
+      const owned = await Promise.all(promises)
+      const userTokens = owned.filter(t => t && t.owner === address).map(t => t!.id)
+      setTokenIds(userTokens)
+      setLoading(false)
+    }
 
-      setTraitsList(owned);
-    };
-
-    fetch();
-  }, [address, client]);
+    fetchTokens()
+  }, [address, isConnected])
 
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">My Tomagotchus</h1>
-      {traitsList.length === 0 ? (
-        <p>You don’t own any Tomagotchus yet.</p>
-      ) : (
-        <ul className="space-y-3">
-          {traitsList.map(({ tokenId, color, shape, animal }) => (
-            <li
-              key={tokenId.toString()}
-              className="border p-4 rounded shadow bg-white text-sm"
-            >
-              <strong>ID:</strong> {tokenId.toString()} <br />
-              <strong>Color:</strong> {color} <br />
-              <strong>Shape:</strong> {shape} <br />
-              <strong>Animal:</strong> {animal}
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-4">My Tomagotchus</h1>
+      {!isConnected && <p>Please connect your wallet to view your collection.</p>}
+      {isConnected && loading && <p>Loading your NFTs...</p>}
+      {isConnected && !loading && tokenIds.length === 0 && <p>You don’t own any yet. Mint one!</p>}
+      <ul className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+        {tokenIds.map((id) => {
+          const [color, shape, animal] = generateTraits(id, address!)
+          return (
+            <li key={id} className="border p-4 rounded text-center">
+              <p>Token #{id}</p>
+              <p className="mt-2 text-xl">🎨 {color} | 🧩 {shape} | 🐾 {animal}</p>
             </li>
-          ))}
-        </ul>
-      )}
+          )
+        })}
+      </ul>
     </div>
-  );
+  )
 }
