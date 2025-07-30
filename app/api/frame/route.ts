@@ -1,4 +1,5 @@
-// app/api/frame/index.tsx
+// app/api/frame/route.ts
+
 import { NextResponse } from 'next/server'
 import { SITE_URL, FRAME_BUTTONS } from '@/lib/constants'
 
