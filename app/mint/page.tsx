@@ -1,75 +1,75 @@
-use client'
+'use client'
 
 import { useState } from 'react'
-import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi'
 import { parseEther } from 'viem'
-import { contractConfig } from '@/lib/contract'
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import Confetti from '@/components/Confetti'
+import ShareButton from '@/components/ShareButton'
 
 export default function MintPage() {
-  const { address, isConnected } = useAccount()
   const [hash, setHash] = useState<`0x${string}` | null>(null)
-  const [preview, setPreview] = useState<number | null>(null)
-  const [totalMinted, setTotalMinted] = useState<number | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [tokenId, setTokenId] = useState<number | null>(null)
+  const [copied, setCopied] = useState(false)
 
-  const { writeContract } = useWriteContract()
-  const { isPending, isSuccess } = useWaitForTransactionReceipt({ hash })
+  const { writeContractAsync } = useWriteContract()
 
   const handleMint = async () => {
-    setLoading(true)
     try {
-      writeContract(
-        {
-          ...contractConfig,
-          functionName: 'mint',
-          value: parseEther('0.001'),
-        },
-        {
-          onSuccess(data) {
-            setHash(data.hash)
-            const fakeId = Math.floor(Math.random() * 10000)
-            setPreview(fakeId)
-          },
-        }
-      )
+      const txHash = await writeContractAsync({
+        address: '0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2', // Your deployed contract
+        abi: [
+          {
+            name: 'mint',
+            type: 'function',
+            stateMutability: 'payable',
+            inputs: [],
+            outputs: []
+          }
+        ],
+        functionName: 'mint',
+        value: parseEther('0.001')
+      })
+
+      setHash(txHash)
     } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
+      console.error('Mint failed:', err)
     }
   }
 
+  const { isLoading: waitingTx } = useWaitForTransactionReceipt({
+    hash,
+    enabled: !!hash,
+    onSuccess() {
+      const newId = Math.floor(Math.random() * 10000) // Simulate ID for now
+      setTokenId(newId)
+
+      const shareText = `I just minted Tomagotchu #${newId}! 🐸✨\n\nTry it yourself: tomagotchu.xyz`
+      navigator.clipboard.writeText(shareText).then(() => setCopied(true))
+    }
+  })
+
   return (
-    <div className="p-8 max-w-xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">Mint a Tomagotchu</h1>
+    <div className="flex flex-col items-center justify-center p-10 text-center">
+      <h1 className="text-3xl font-bold mb-6">Mint Your Tomagotchu 🐸</h1>
 
-      {!isConnected && <p>Please connect your wallet to mint.</p>}
-
-      {isConnected && (
+      {tokenId === null ? (
+        <button
+          onClick={handleMint}
+          disabled={waitingTx}
+          className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 disabled:opacity-50"
+        >
+          {waitingTx ? 'Minting...' : 'Mint (0.001 ETH)'}
+        </button>
+      ) : (
         <>
-          <button
-            onClick={handleMint}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-            disabled={isPending || loading}
-          >
-            {loading || isPending ? 'Minting...' : 'Mint for 0.001 ETH'}
-          </button>
-
-          {isSuccess && (
-            <div className="mt-4 p-4 border rounded bg-green-100 text-green-700">
-              Successfully minted!
-            </div>
-          )}
-
-          {preview !== null && (
-            <div className="mt-6">
-              <p className="mb-2 font-medium">Trait Preview (Random):</p>
-              <div className="p-6 border rounded text-center bg-gray-100 text-4xl">🐸</div>
-              <p className="mt-2 text-sm text-gray-500">Token ID (simulated): #{preview}</p>
-            </div>
-          )}
+          <p className="mt-4 text-xl">Success! 🎉</p>
+          <p className="mb-2">You minted Tomagotchu #{tokenId}</p>
+          {copied && <p className="text-sm text-green-500">Share text copied to clipboard ✅</p>}
+          <ShareButton tokenId={tokenId} />
         </>
       )}
+
+      {tokenId !== null && <Confetti />}
     </div>
   )
-}
+}p
