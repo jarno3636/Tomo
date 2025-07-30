@@ -1,6 +1,3 @@
-// app/api/frame/[id]/route.ts
-
-import { NextRequest } from 'next/server'
 import { ImageResponse } from 'next/og'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
@@ -8,7 +5,7 @@ import { generateImage } from '@/lib/generateImage'
 export const runtime = 'edge'
 
 export async function GET(
-  req: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const tokenId = parseInt(params.id)
@@ -18,7 +15,10 @@ export async function GET(
 
   const traits = getTraits(tokenId)
   const svg = generateImage(traits)
-  const svgBase64 = Buffer.from(svg).toString('base64')
+
+  const svgBuffer = Buffer.from(svg)
+  const base64 = svgBuffer.toString('base64')
+  const imageUrl = `data:image/svg+xml;base64,${base64}`
 
   return new ImageResponse(
     (
@@ -27,27 +27,20 @@ export async function GET(
           width: '100%',
           height: '100%',
           display: 'flex',
-          background: 'black',
           alignItems: 'center',
           justifyContent: 'center',
-          flexDirection: 'column',
-          fontSize: 32,
-          color: 'white',
+          background: '#fff',
           fontFamily: 'monospace',
+          flexDirection: 'column'
         }}
       >
-        <img
-          src={`data:image/svg+xml;base64,${svgBase64}`}
-          width={300}
-          height={300}
-          alt={`Tomagotchu #${tokenId}`}
-        />
-        <p style={{ marginTop: 20 }}>{traits.color.name} • {traits.shape.name} • {traits.animal.name}</p>
+        <img src={imageUrl} width="200" height="200" alt={`Tomagotchu #${tokenId}`} />
+        <p style={{ fontSize: 24, marginTop: 20 }}>Tomagotchu #{tokenId}</p>
       </div>
     ),
     {
       width: 600,
-      height: 600,
+      height: 400
     }
   )
 }
