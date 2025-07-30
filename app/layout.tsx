@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Tomagotchu | On-Chain NFT Pet',
     description: 'Mint your own Tomagotchu — a fully on-chain NFT pet with unique traits!',
-    images: ['https://tomagotchu.xyz/og/tomagotchu-og.png'],
+    images: ['https://tomagotchu.xyz/og/tomagotchu-og.png.PNG'],
     creator: '@yourhandle', // Optional
   },
   metadataBase: new URL('https://tomagotchu.xyz'),
