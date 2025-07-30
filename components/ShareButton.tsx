@@ -14,9 +14,9 @@ export default function ShareButton({ tokenId }: Props) {
   const handleClick = () => {
     const castUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(shareText)}`
     if (typeof window !== 'undefined') {
-      window.open(castUrl, '_blank')
       navigator.clipboard.writeText(shareText).then(() => {
         setCopied(true)
+        window.open(castUrl, '_blank')
         setTimeout(() => setCopied(false), 2000)
       })
     }
