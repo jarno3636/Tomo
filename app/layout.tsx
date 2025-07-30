@@ -35,19 +35,12 @@ export const metadata: Metadata = {
     'fc:frame:image': 'https://tomagotchu.xyz/frame',
     'fc:frame:button:1': 'Mint Yours!',
     'fc:frame:post_url': 'https://tomagotchu.xyz/mint',
-  },
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        {/* Google Fonts for Inter & Roboto Mono */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Roboto+Mono&display=swap"
-        />
-      </head>
       <body>
         <Providers>{children}</Providers>
       </body>
