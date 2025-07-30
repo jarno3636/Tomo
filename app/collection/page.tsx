@@ -3,16 +3,11 @@
 import { useAccount } from 'wagmi'
 import { useEffect, useState } from 'react'
 import { readContract } from '@wagmi/core'
-import Image from 'next/image'
 
-// ABI should live in lib/TomagotchuABI.ts and be a default export
+// ABI from lib/TomagotchuABI.ts
 import TomagotchuABI from '@/lib/TomagotchuABI'
-
-// Your constants file is in lib/constants.ts
+// CONTRACT_ADDRESS from lib/constants.ts
 import { CONTRACT_ADDRESS } from '@/lib/constants'
-
-// Generate trait names/rarity from on‑chain numbers
-import { generateTraits } from '@/lib/traits'
 
 type NFT = {
   tokenId: number
@@ -39,31 +34,29 @@ export default function CollectionPage() {
             functionName: 'ownerOf',
             args: [tokenId]
           })
+          if (String(owner).toLowerCase() !== address.toLowerCase()) continue
 
-          if (String(owner).toLowerCase() === address.toLowerCase()) {
-            // generateTraits returns { color, shape, animal }
-            const { color, shape, animal } = await readContract({
-              address: CONTRACT_ADDRESS,
-              abi: TomagotchuABI,
-              functionName: 'generateTraits',
-              args: [tokenId, address]
-            }) as { color: number; shape: number; animal: number }
+          const { color, shape, animal } = (await readContract({
+            address: CONTRACT_ADDRESS,
+            abi: TomagotchuABI,
+            functionName: 'generateTraits',
+            args: [tokenId, address]
+          })) as { color: number; shape: number; animal: number }
 
-            // convert numeric trait to rarity string
-            const getRarity = (t: number) => (t < 6 ? 'common' : t < 9 ? 'rare' : 'legendary')
+          const getRarity = (t: number) =>
+            t < 6 ? 'common' : t < 9 ? 'rare' : 'legendary'
 
-            results.push({
-              tokenId,
-              traits: { color, shape, animal },
-              rarity: {
-                color: getRarity(color),
-                shape: getRarity(shape),
-                animal: getRarity(animal)
-              }
-            })
-          }
+          results.push({
+            tokenId,
+            traits: { color, shape, animal },
+            rarity: {
+              color: getRarity(color),
+              shape: getRarity(shape),
+              animal: getRarity(animal)
+            }
+          })
         } catch {
-          // skip non‑existent tokens
+          // token not minted
         }
       }
       setNfts(results)
