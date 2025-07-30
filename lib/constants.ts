@@ -3,7 +3,9 @@
 export const CONTRACT_ADDRESS = '0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2'
 export const MINT_PRICE_ETH = '0.001'
 export const SITE_URL = 'https://tomagotchu.xyz'
-export const OG_IMAGE = `${SITE_URL}/og/tomagotchu-og.png.PNG`
+export const OG_IMAGE = `${SITE_URL}/og/tomagotchu-og.png`
+
+export const WALLETCONNECT_PROJECT_ID = '8d389a211728bfed10834a260898662e'
 
 export const FRAME_BUTTONS = [
   {
