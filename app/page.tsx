@@ -31,15 +31,15 @@ function Connect() {
 
   return (
     <div className="space-x-2">
-      {connectors.map((connector) => (
+      {connectors.map((c) => (
         <button
-          key={connector.id}
-          disabled={!connector.ready || isLoading}
-          onClick={() => connect({ connector })}
+          key={c.id}
+          disabled={!c.ready || isLoading}
+          onClick={() => connect({ connector: c })}
           className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
-          {connector.name}
-          {!connector.ready && ' (unsupported)'}
+          {c.name}
+          {!c.ready && ' (unsupported)'}
         </button>
       ))}
       {error && <p className="mt-2 text-red-500">{error.message}</p>}
