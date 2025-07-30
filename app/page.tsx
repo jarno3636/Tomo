@@ -3,7 +3,6 @@
 
 import { useState } from 'react'
 import { useAccount, useConnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
 import MintButton from '@/components/MintButton'
 import TraitReveal from '@/components/TraitReveal'
 
@@ -28,17 +27,22 @@ export default function HomePage() {
 }
 
 function Connect() {
-  const { connect } = useConnect()
+  const { connect, connectors, isLoading, error } = useConnect()
+
   return (
-    <button
-      className="px-4 py-2 bg-blue-600 text-white rounded"
-      onClick={() =>
-        connect({
-          connector: new InjectedConnector(),
-        })
-      }
-    >
-      Connect Wallet
-    </button>
+    <div className="space-x-2">
+      {connectors.map((connector) => (
+        <button
+          key={connector.id}
+          disabled={!connector.ready || isLoading}
+          onClick={() => connect({ connector })}
+          className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+        >
+          {connector.name}
+          {!connector.ready && ' (unsupported)'}
+        </button>
+      ))}
+      {error && <p className="mt-2 text-red-500">{error.message}</p>}
+    </div>
   )
 }
