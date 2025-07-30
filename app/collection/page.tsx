@@ -3,10 +3,10 @@
 
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
-import { readContract } from "@wagmi/core";
-import { TomagotchuABI } from "@/lib/TomagotchuABI";
-import { generateTraitsFromSeed } from "@/utils/generateTraits";
-import { CONTRACT_ADDRESS } from "@/constants";
+import { readContract } from "../../wagmi/core";
+import { TomagotchuABI } from "../../lib/TomagotchuABI";
+import { generateTraitsFromSeed } from "../../utils/generateTraits";
+import { CONTRACT_ADDRESS } from "../../constants";
 import Image from "next/image";
 
 type NFT = {
