@@ -17,24 +17,24 @@ export const metadata: Metadata = {
         url: 'https://tomagotchu.xyz/og/tomagotchu-og.png',
         width: 1200,
         height: 630,
-        alt: 'Tomagotchu Open Graph Image',
-      },
+        alt: 'Tomagotchu Open Graph Image'
+      }
     ],
     locale: 'en_US',
-    type: 'website',
+    type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Tomagotchu | On-Chain NFT Pet',
     description: 'Mint your own Tomagotchu — a fully on-chain NFT pet with unique traits!',
     images: ['https://tomagotchu.xyz/og/tomagotchu-og.png'],
-    creator: '@yourhandle',
+    creator: '@yourhandle'
   },
   other: {
     'fc:frame': 'vNext',
     'fc:frame:image': 'https://tomagotchu.xyz/frame',
     'fc:frame:button:1': 'Mint Yours!',
-    'fc:frame:post_url': 'https://tomagotchu.xyz/mint',
+    'fc:frame:post_url': 'https://tomagotchu.xyz/mint'
   }
 }
 
