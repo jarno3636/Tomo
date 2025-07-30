@@ -1,57 +1,40 @@
 // app/layout.tsx
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import Link from 'next/link'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Tomagotchu | On-Chain NFT Mint',
-  description: 'Mint fully on-chain Tomagotchu NFTs with unique traits. Built on Ethereum.',
+  title: 'Tomagotchu | On-Chain NFT Pet',
+  description: 'Mint your own Tomagotchu — a fully on-chain NFT pet with unique traits!',
   openGraph: {
-    title: 'Tomagotchu | On-Chain NFT Mint',
-    description: 'Each Tomagotchu is 100% generated on-chain with rare and legendary traits.',
+    title: 'Tomagotchu | On-Chain NFT Pet',
+    description: 'Mint your own Tomagotchu — a fully on-chain NFT pet with unique traits!',
+    url: 'https://tomagotchu.xyz',
+    siteName: 'Tomagotchu',
     images: [
       {
-        url: '/og-tomagotchu.png',
+        url: 'https://tomagotchu.xyz/og/tomagotchu-og.png',
         width: 1200,
         height: 630,
-        alt: 'Tomagotchu NFT',
+        alt: 'Tomagotchu Open Graph Image',
       },
     ],
+    locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Tomagotchu | On-Chain NFT Mint',
-    description: 'Each Tomagotchu is 100% generated on-chain with rare and legendary traits.',
-    images: ['/og-tomagotchu.png'],
+    title: 'Tomagotchu | On-Chain NFT Pet',
+    description: 'Mint your own Tomagotchu — a fully on-chain NFT pet with unique traits!',
+    images: ['https://tomagotchu.xyz/og/tomagotchu-og.png'],
+    creator: '@yourhandle', // Optional
   },
+  metadataBase: new URL('https://tomagotchu.xyz'),
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <header className="w-full border-b bg-white px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="font-bold text-xl text-green-600">🐸 Tomagotchu</Link>
-          <nav className="flex gap-4 text-sm text-gray-700">
-            <Link href="/mint">Mint</Link>
-            <Link href="/myo">My Collection</Link>
-            <Link href="/gallery">Gallery</Link>
-            <Link href="/info">Info</Link>
-          </nav>
-        </header>
-        <main className="min-h-screen bg-gray-50">{children}</main>
-        <footer className="border-t text-center p-4 text-sm text-gray-500">
-          © 2025 Tomagotchu • Fully On-Chain Frogs 🐸
-        </footer>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }
