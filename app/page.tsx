@@ -1,13 +1,10 @@
-// app/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { useAccount, useConnect } from 'wagmi'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { injected, walletConnect } from 'wagmi/connectors'
 import MintButton from '@/components/MintButton'
 import TraitReveal from '@/components/TraitReveal'
-import { WALLETCONNECT_PROJECT_ID } from '@/lib/constants'
 
 export default function HomePage() {
   const { isConnected } = useAccount()
@@ -30,15 +27,12 @@ export default function HomePage() {
 }
 
 function Connect() {
-  const { connect, connectors, isLoading, error } = useConnect({
-    connectors: [
-      new InjectedConnector(),
-      new WalletConnectConnector({ options: { projectId: WALLETCONNECT_PROJECT_ID } }),
-    ],
+  const { connect, connectors, error, isLoading } = useConnect({
+    connectors: [injected(), walletConnect({ projectId: '8d389a211728bfed10834a260898662e' })],
   })
 
   return (
-    <div className="flex flex-col space-y-2 items-center">
+    <div className="space-x-2">
       {connectors.map((connector) => (
         <button
           key={connector.id}
@@ -47,10 +41,9 @@ function Connect() {
           className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
           {connector.name}
-          {!connector.ready && ' (unsupported)'}
         </button>
       ))}
-      {error && <p className="mt-2 text-red-500 text-sm">Error: {error.message}</p>}
+      {error && <p className="text-red-500 mt-2">{error.message}</p>}
     </div>
   )
 }
