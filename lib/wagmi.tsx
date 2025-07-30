@@ -1,34 +1,34 @@
-// lib/wagmi.ts
-'use client';
-import { configureChains, createConfig, WagmiConfig } from 'wagmi';
-import { mainnet } from 'viem/chains';
-import { publicProvider } from 'wagmi/providers/public';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { ReactNode } from 'react';
+'use client'
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet],
-  [publicProvider()]
-);
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createConfig, WagmiConfig, http } from 'wagmi'
+import { mainnet } from 'wagmi/chains'
+import { injected, walletConnect } from 'wagmi/connectors'
+import { publicProvider } from 'wagmi/providers/public'
+import type { ReactNode } from 'react'
+
+const queryClient = new QueryClient()
 
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
-    new InjectedConnector({ chains }),
-    new WalletConnectConnector({ chains, options: { projectId: 'YOUR_PROJECT_ID' } })
+    injected(),
+    walletConnect({
+      projectId: '8d389a211728bfed10834a260898662e'
+    })
   ],
-  publicClient,
-  webSocketPublicClient
-});
-
-const queryClient = new QueryClient();
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http()
+  }
+})
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiConfig config={wagmiConfig}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+      </QueryClientProvider>
     </WagmiConfig>
-  );
+  )
 }
