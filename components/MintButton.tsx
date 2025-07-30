@@ -2,24 +2,25 @@
 
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { useState } from 'react'
-import { parseEther, encodeFunctionData } from 'viem'
+import { parseEther } from 'viem'
 
 type Props = {
-  onMint: (tokenId: number) => void
+  onMint: () => void
 }
 
+const CONTRACT_ADDRESS = '0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2'
+
 export default function MintButton({ onMint }: Props) {
-  const [hash, setHash] = useState<`0x${string}` | null>(null)
+  const [txHash, setTxHash] = useState<`0x${string}` | null>(null)
   const [loading, setLoading] = useState(false)
-  const [tokenId, setTokenId] = useState<number | null>(null)
 
   const { writeContractAsync } = useWriteContract()
 
   const handleMint = async () => {
     setLoading(true)
     try {
-      const txHash = await writeContractAsync({
-        address: '0xYourContractAddressHere', // replace with deployed address
+      const hash = await writeContractAsync({
+        address: CONTRACT_ADDRESS,
         abi: [
           {
             name: 'mint',
@@ -33,20 +34,22 @@ export default function MintButton({ onMint }: Props) {
         value: parseEther('0.001')
       })
 
-      setHash(txHash)
+      setTxHash(hash)
     } catch (err) {
-      console.error('Mint failed', err)
+      console.error('Mint failed:', err)
       setLoading(false)
     }
   }
 
-  const { isLoading: waitingTx } = useWaitForTransactionReceipt({
-    hash,
-    enabled: !!hash,
+  const { isLoading: waiting } = useWaitForTransactionReceipt({
+    hash: txHash,
+    enabled: !!txHash,
     onSuccess() {
-      const mintedId = Math.floor(Math.random() * 10000) // simulate for now
-      setTokenId(mintedId)
-      onMint(mintedId)
+      onMint()
+      setLoading(false)
+      setTxHash(null)
+    },
+    onError() {
       setLoading(false)
     }
   })
@@ -56,9 +59,9 @@ export default function MintButton({ onMint }: Props) {
       <button
         onClick={handleMint}
         className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
-        disabled={loading || waitingTx}
+        disabled={loading || waiting}
       >
-        {loading || waitingTx ? 'Minting...' : 'Mint Tomagotchu (0.001 ETH)'}
+        {loading || waiting ? 'Minting...' : 'Mint Tomagotchu (0.001 ETH)'}
       </button>
     </div>
   )
