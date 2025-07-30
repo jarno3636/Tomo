@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-import { contractConfig } from '@/lib/contract'
+import { contractConfig } from '../../lib/contract'
 import { readContract } from '@wagmi/core'
-import { generateTraits } from '@/lib/traits'
+import { generateTraits } from '../../lib/traits'
 
 export default function MyCollectionPage() {
   const { address, isConnected } = useAccount()
