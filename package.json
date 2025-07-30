@@ -8,14 +8,22 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "dependencies": {
+   "dependencies": {
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+
+    // Wagmi v2 + Core
     "wagmi": "^2.16.0",
     "@wagmi/core": "^2.18.0",
+
+    // Viem v2 for Wagmi
     "viem": "^2.33.1",
-    "@tanstack/react-query": "^4.35.3",
+
+    // React Query v5 → required by wagmi v2
+    "@tanstack/react-query": "^5.0.0",
+
+    // Confetti animation
     "canvas-confetti": "^1.6.0"
   },
   "devDependencies": {
