@@ -1,3 +1,4 @@
+// components/TraitReveal.tsx
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -16,8 +17,7 @@ export default function TraitReveal({ tokenId }: Props) {
   useEffect(() => {
     const t = getTraits(tokenId)
     setTraits(t)
-    const svg = generateImage(t)
-    setImage(svg)
+    setImage(generateImage(t))
   }, [tokenId])
 
   if (!traits || !image) return null
