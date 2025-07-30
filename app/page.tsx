@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { useAccount, useConnect, useDisconnect, useWriteContract } from 'wagmi'
 import { injected } from 'wagmi/connectors'
 import { parseEther } from 'viem'
-import MintButton from '../../components/MintButton'
-import TraitReveal from '../../components/TraitReveal'
+import MintButton from '@/components/MintButton'
+import TraitReveal from '@/components/TraitReveal'
 
 export default function HomePage() {
   const { address, isConnected } = useAccount()
