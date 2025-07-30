@@ -1,44 +1,28 @@
 // app/api/traits/route.ts
-import type { NextRequest } from 'next/server'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
-import { TOMAGOTCHU_ADDRESS, TOMAGOTCHU_ABI } from '@/lib/contracts'
+import { TOMAGOTCHU_CONTRACT } from '@/lib/contract'
 
-const publicClient = createPublicClient({
+const client = createPublicClient({
   chain: mainnet,
-  transport: http(),
+  transport: http()
 })
 
-export async function GET(request: NextRequest) {
-  const tokenIdParam = request.nextUrl.searchParams.get('tokenId')
-  const userParam = request.nextUrl.searchParams.get('user')
-  if (!tokenIdParam || !userParam) {
-    return NextResponse.json(
-      { error: 'Missing tokenId or user query parameter' },
-      { status: 400 }
-    )
+export async function GET(req: NextRequest) {
+  const tokenIdParam = req.nextUrl.searchParams.get('tokenId')
+  const user = req.nextUrl.searchParams.get('user')
+  if (!tokenIdParam || !user) {
+    return new NextResponse('Missing params', { status: 400 })
   }
+  const tokenId = BigInt(tokenIdParam)
 
-  let tokenId: bigint
-  try {
-    tokenId = BigInt(tokenIdParam)
-  } catch {
-    return NextResponse.json({ error: 'Invalid tokenId' }, { status: 400 })
-  }
+  const [color, shape, animal] = await client.readContract({
+    address: TOMAGOTCHU_CONTRACT.address,
+    abi: TOMAGOTCHU_CONTRACT.abi,
+    functionName: 'generateTraits',
+    args: [tokenId, user as `0x${string}`]
+  })
 
-  try {
-    // generateTraits returns [uint8 color, uint8 shape, uint8 animal]
-    const [color, shape, animal] = (await publicClient.readContract({
-      address: TOMAGOTCHU_ADDRESS,
-      abi: TOMAGOTCHU_ABI,
-      functionName: 'generateTraits',
-      args: [tokenId, userParam as `0x${string}`],
-    })) as [number, number, number]
-
-    return NextResponse.json({ color, shape, animal })
-  } catch (err) {
-    console.error('generateTraits failed', err)
-    return NextResponse.json({ error: 'Contract call failed' }, { status: 500 })
-  }
+  return NextResponse.json({ color, shape, animal })
 }
