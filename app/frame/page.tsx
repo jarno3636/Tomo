@@ -1,25 +1,59 @@
-// app/frame/page.tsx
+// app/frame/[id]/page.tsx
+import { notFound } from 'next/navigation'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
+import { FRAME_BUTTONS, SITE_URL } from '@/lib/constants'
 
-export const dynamic = 'force-dynamic'
+type Params = { params: { id: string } }
 
-export default async function FramePreview() {
-  const sampleTokenId = 1234
-  const traits = getTraits(sampleTokenId)
+export async function generateMetadata({ params }: Params) {
+  const id = parseInt(params.id)
+  if (isNaN(id)) return notFound()
+
+  const traits = getTraits(id)
+  const image = generateImage(traits)
+  const svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(image)}`
+  const title = `Tomagotchu #${id}`
+  const description = `Traits: ${traits.color.name}, ${traits.shape.name}, ${traits.animal.name}`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: svgUrl }],
+      type: 'website'
+    },
+    other: {
+      'fc:frame': 'vNext',
+      'fc:frame:image': svgUrl,
+      'fc:frame:button:1': FRAME_BUTTONS[0].label,
+      'fc:frame:button:1:action': FRAME_BUTTONS[0].action,
+      'fc:frame:button:1:target': FRAME_BUTTONS[0].target,
+      'fc:frame:button:2': FRAME_BUTTONS[1].label,
+      'fc:frame:button:2:action': FRAME_BUTTONS[1].action,
+      'fc:frame:button:2:target': FRAME_BUTTONS[1].target,
+      'fc:frame:post_url': `${SITE_URL}/mint`
+    }
+  }
+}
+
+export default function FramePage({ params }: Params) {
+  const id = parseInt(params.id)
+  const traits = getTraits(id)
   const image = generateImage(traits)
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold mb-6">Farcaster Frame Preview</h1>
-      <div className="bg-white p-4 border rounded shadow-lg max-w-xs">
-        <img
-          src={`data:image/svg+xml;utf8,${encodeURIComponent(image)}`}
-          alt={`Tomagotchu #${sampleTokenId}`}
-          className="w-full h-auto"
-        />
-        <p className="mt-2 text-center text-gray-700">Tomagotchu #{sampleTokenId}</p>
-      </div>
+    <div className="p-6 flex flex-col items-center text-center">
+      <h1 className="text-2xl font-bold mb-2">Tomagotchu #{id}</h1>
+      <div
+        className="w-[300px] h-[300px] border shadow bg-white p-2"
+        dangerouslySetInnerHTML={{ __html: image }}
+      />
+      <p className="mt-2 text-gray-600">
+        {traits.color.name} • {traits.shape.name} • {traits.animal.name}
+      </p>
     </div>
   )
 }
