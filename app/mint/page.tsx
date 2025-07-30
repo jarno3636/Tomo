@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { parseEther } from 'viem'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import Confetti from '@/components/Confetti'
-import ShareButton from '@/components/ShareButton'
+import Confetti from '../../components/Confetti'
+import ShareButton from '../../components/ShareButton'
 
 export default function MintPage() {
   const [hash, setHash] = useState<`0x${string}` | null>(null)
