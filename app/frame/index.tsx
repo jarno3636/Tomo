@@ -1,27 +1,31 @@
-// app/frame/index.tsx
-
+// app/api/frame/index.tsx
 import { NextResponse } from 'next/server'
-import { getTraits } from '@/lib/traits'
-import { generateImage } from '@/lib/generateImage'
-
-export const dynamic = 'force-dynamic'
+import { SITE_URL, FRAME_BUTTONS } from '@/lib/constants'
 
 export async function GET() {
-  const tokenId = Math.floor(Math.random() * 10000)
-  const traits = getTraits(tokenId)
-  const imageSvg = generateImage(traits)
-  const imageUrl = `data:image/svg+xml;utf8,${encodeURIComponent(imageSvg)}`
-
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/html',
-      'Cache-Control': 'no-cache',
-      'Refresh': '0; url=/frame/' + tokenId,
-      'Location': '/frame/' + tokenId,
-      'Frame-Image': imageUrl,
-      'Frame-Post-Url': `https://tomagotchu.xyz/frame/${tokenId}`,
-      'Frame-Button-Text': 'Mint One!',
-    }
-  })
+  return NextResponse.json(
+    {
+      title: 'Tomagotchu Frame',
+      description: 'Mint your own on-chain Tomagotchu NFT!',
+      image: `${SITE_URL}/og/tomagotchu-og.png`,
+      frame: {
+        version: 'vNext',
+        image: `${SITE_URL}/og/tomagotchu-og.png`,
+        post_url: `${SITE_URL}/mint`,
+        buttons: [
+          {
+            label: FRAME_BUTTONS[0].label,
+            action: FRAME_BUTTONS[0].action,
+            target: `${SITE_URL}${FRAME_BUTTONS[0].target}`
+          },
+          {
+            label: FRAME_BUTTONS[1].label,
+            action: FRAME_BUTTONS[1].action,
+            target: `${SITE_URL}${FRAME_BUTTONS[1].target}`
+          }
+        ]
+      }
+    },
+    { status: 200 }
+  )
 }
