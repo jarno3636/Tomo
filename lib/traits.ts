@@ -40,20 +40,4 @@ const animalTraits: TraitInfo[] = [
   { name: 'Fox', rarity: 'Rare', hex: '#000000' },
   { name: 'Panda', rarity: 'Rare', hex: '#000000' },
   { name: 'Penguin', rarity: 'Rare', hex: '#000000' },
-  { name: 'Dragon', rarity: 'Legendary', hex: '#000000' }
-]
-
-export function getTraits(tokenId: number) {
-  const seed = tokenId + 1337
-
-  function getIndex(seed: number, offset: number): number {
-    const hash = (BigInt(seed) * BigInt(offset + 1)) % BigInt(10)
-    return Number(hash)
-  }
-
-  return {
-    color: colorTraits[getIndex(seed, 0)],
-    shape: shapeTraits[getIndex(seed, 1)],
-    animal: animalTraits[getIndex(seed, 2)]
-  }
-}
+  { name: 'Dragon', rarity: 'Legendary', hex: '#000000'
