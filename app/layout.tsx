@@ -8,7 +8,7 @@ export const metadata = {
     siteName: 'Tomagotchu',
     images: [
       {
-        url: 'https://tomagotchu.xyz/og.png',
+        url: 'https://tomagotchu.xyz/og.PNG',
         width: 1200,
         height: 630,
         alt: 'Tomagotchu — Mint On-Chain NFT Pets',
@@ -21,7 +21,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Tomagotchu | On-Chain NFT Fun',
     description: 'Mint your on-chain Tomagotchu NFT!',
-    images: ['https://tomagotchu.xyz/og.png'],
+    images: ['https://tomagotchu.xyz/og.PNG'],
     creator: '@your_handle_here', // Optional
   },
 }
