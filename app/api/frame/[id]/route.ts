@@ -1,40 +1,41 @@
 // app/api/frame/[id]/route.ts
-import { ImageResponse } from '@vercel/og'
-import { getTraits } from '@/lib/traits'
-import { generateImage } from '@/lib/generateImage'
+import { ImageResponse } from 'next/og';
+import { getTraits } from '@/lib/traits';
+import { generateImage } from '@/lib/generateImage';
 
-export const runtime = 'edge'
+export const runtime = 'edge';
 
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: { id: string } }
 ) {
-  const tokenId = parseInt(params.id, 10)
-  if (isNaN(tokenId)) {
-    return new Response('Invalid token ID', { status: 400 })
+  const tokenId = Number(params.id);
+  if (Number.isNaN(tokenId)) {
+    return new Response('Invalid token ID', { status: 400 });
   }
-
-  const traits = getTraits(tokenId)
-  const svg = generateImage(traits)
+  const traits = getTraits(tokenId);
+  const svg = generateImage(traits);
+  const svgEncoded = encodeURIComponent(svg);
+  const imageUrl = `data:image/svg+xml;utf8,${svgEncoded}`;
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: 600,
-          height: 400,
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: '#fff',
-          fontFamily: 'monospace'
+          justifyContent: 'center',
+          background: '#fff',
+          width: '100%',
+          height: '100%',
+          fontFamily: 'monospace',
         }}
       >
-        <div dangerouslySetInnerHTML={{ __html: svg }} />
+        <img src={imageUrl} width="200" height="200" alt={`Tomagotchu #${tokenId}`} />
         <p style={{ marginTop: 20, fontSize: 24 }}>Tomagotchu #{tokenId}</p>
       </div>
     ),
     { width: 600, height: 400 }
-  )
+  );
 }
