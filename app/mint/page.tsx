@@ -1,52 +1,47 @@
+// app/mint/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { parseEther } from 'viem'
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import Confetti from '../../components/Confetti'
-import ShareButton from '../../components/ShareButton'
+import Confetti from '@/components/Confetti'
+import ShareButton from '@/components/ShareButton'
+import { CONTRACT_ADDRESS } from '@/lib/constants'
+import TomagotchuABI from '@/lib/TomagotchuABI'
 
 export default function MintPage() {
   const [hash, setHash] = useState<`0x${string}` | null>(null)
   const [tokenId, setTokenId] = useState<number | null>(null)
   const [copied, setCopied] = useState(false)
 
-  const { writeContractAsync } = useWriteContract()
-
-  const handleMint = async () => {
-    try {
-      const txHash = await writeContractAsync({
-        address: '0xacc4b4d66bc7dcab0ae15ee0effece546ceb68d2', // Your deployed contract
-        abi: [
-          {
-            name: 'mint',
-            type: 'function',
-            stateMutability: 'payable',
-            inputs: [],
-            outputs: []
-          }
-        ],
-        functionName: 'mint',
-        value: parseEther('0.001')
-      })
-
-      setHash(txHash)
-    } catch (err) {
-      console.error('Mint failed:', err)
-    }
-  }
+  const { writeContractAsync } = useWriteContract({
+    address: CONTRACT_ADDRESS,
+    abi: TomagotchuABI,
+    functionName: 'mint',
+    value: parseEther('0.001'),
+  })
 
   const { isLoading: waitingTx } = useWaitForTransactionReceipt({
     hash,
     enabled: !!hash,
     onSuccess() {
-      const newId = Math.floor(Math.random() * 10000) // Simulate ID for now
+      // For now we simulate the new token ID
+      const newId = Math.floor(Math.random() * 10000)
       setTokenId(newId)
 
-      const shareText = `I just minted Tomagotchu #${newId}! 🐸✨\n\nTry it yourself: tomagotchu.xyz`
+      const shareText = `I just minted Tomagotchu #${newId}! 🐸✨\n\nTry it yourself: https://tomagotchu.xyz`
       navigator.clipboard.writeText(shareText).then(() => setCopied(true))
-    }
+    },
   })
+
+  const handleMint = async () => {
+    try {
+      const txHash = await writeContractAsync()
+      setHash(txHash)
+    } catch (err) {
+      console.error('Mint failed:', err)
+    }
+  }
 
   return (
     <div className="flex flex-col items-center justify-center p-10 text-center">
@@ -72,4 +67,4 @@ export default function MintPage() {
       {tokenId !== null && <Confetti />}
     </div>
   )
-}p
+}
