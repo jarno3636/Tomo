@@ -2,6 +2,7 @@
 
 import './globals.css'
 import type { Metadata } from 'next'
+import { Providers } from '@/lib/wagmi'
 
 export const metadata: Metadata = {
   title: 'Tomagotchu | On-Chain NFT Pet',
@@ -35,13 +36,15 @@ export const metadata: Metadata = {
     'fc:frame:image': 'https://tomagotchu.xyz/frame',
     'fc:frame:button:1': 'Mint Yours!',
     'fc:frame:post_url': 'https://tomagotchu.xyz/mint',
-  }
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   )
 }
