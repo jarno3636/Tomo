@@ -1,28 +1,44 @@
+// lib/wagmi.ts
 'use client'
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createConfig, WagmiConfig, http } from 'wagmi'
-import { mainnet } from 'wagmi/chains'
-import { injected, walletConnect } from 'wagmi/connectors'
+import { configureChains, createConfig, WagmiConfig } from 'wagmi'
+import { mainnet } from 'viem/chains'
 import { publicProvider } from 'wagmi/providers/public'
+import { http } from 'wagmi/transports/http'
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 
-const queryClient = new QueryClient()
+// 1. Configure chains & providers
+const { chains, publicClient, webSocketPublicClient } = configureChains(
+  [mainnet],
+  [
+    publicProvider(),
+    http()
+  ]
+)
 
+// 2. Create the wagmi config with connectors
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
-    injected(),
-    walletConnect({
-      projectId: '8d389a211728bfed10834a260898662e'
+    new MetaMaskConnector({ chains }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        projectId: '8d389a211728bfed10834a260898662e' // ← your WalletConnect projectId
+      }
     })
   ],
-  chains: [mainnet],
-  transports: {
-    [mainnet.id]: http()
-  }
+  publicClient,
+  webSocketPublicClient
 })
 
+// 3. React Query client
+const queryClient = new QueryClient()
+
+// 4. App wrapper
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <WagmiConfig config={wagmiConfig}>
@@ -32,3 +48,6 @@ export function Providers({ children }: { children: ReactNode }) {
     </WagmiConfig>
   )
 }
+
+// 5. Export publicClient so you can pass it into readContract()
+export { publicClient }
