@@ -48,9 +48,8 @@ const animalTraits: TraitInfo[] = [
 export function getTraits(tokenId: number) {
   const seed = tokenId + 1337
 
-  function getIndex(seed: number, offset: number): number {
-    const hash = (BigInt(seed) * BigInt(offset + 1)) % BigInt(10)
-    return Number(hash)
+  function getIndex(s: number, offset: number): number {
+    return Number((BigInt(s) * BigInt(offset + 1)) % BigInt(10))
   }
 
   return {
