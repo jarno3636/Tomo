@@ -1,12 +1,16 @@
-// app/api/frame/[id]/route.ts
+// app/api/frame/[id]/route.tsx
 import { ImageResponse } from '@vercel/og'
+import { NextRequest } from 'next/server'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
 
-export const runtime = 'edge'
+// This tells Vercel to run this as an edge function
+export const config = {
+  runtime: 'edge',
+}
 
 export async function GET(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const tokenId = parseInt(params.id, 10)
@@ -14,19 +18,21 @@ export async function GET(
     return new Response('Invalid token ID', { status: 400 })
   }
 
+  // Generate the same SVG you’re already creating on-chain
   const traits = getTraits(tokenId)
   const svg = generateImage(traits)
 
-  // turn the SVG into a data-URI so <img> can render it
-  const svgBase64 = Buffer.from(svg).toString('base64')
-  const imageUrl = `data:image/svg+xml;base64,${svgBase64}`
+  // Turn it into a data URI so <ImageResponse> can inline it
+  const svgB64 = Buffer.from(svg).toString('base64')
+  const imageUrl = `data:image/svg+xml;base64,${svgB64}`
 
+  // Compose a 600×400 OG image
   return new ImageResponse(
     (
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          width: 600,
+          height: 400,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -41,14 +47,11 @@ export async function GET(
           height={200}
           alt={`Tomagotchu #${tokenId}`}
         />
-        <p style={{ marginTop: 20, fontSize: 24 }}>
+        <p style={{ fontSize: 24, marginTop: 20 }}>
           Tomagotchu #{tokenId}
         </p>
       </div>
     ),
-    {
-      width: 600,
-      height: 400,
-    }
+    { width: 600, height: 400 }
   )
 }
