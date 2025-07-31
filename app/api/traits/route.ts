@@ -1,5 +1,4 @@
 // app/api/traits/route.ts
-
 import { NextRequest, NextResponse } from 'next/server'
 import { createPublicClient, http } from 'viem'
 import { mainnet } from 'viem/chains'
@@ -12,17 +11,19 @@ const client = createPublicClient({
 
 export async function GET(req: NextRequest) {
   const tokenIdParam = req.nextUrl.searchParams.get('tokenId')
-  const user = req.nextUrl.searchParams.get('user')
-  if (!tokenIdParam || !user) {
-    return new NextResponse('Missing params', { status: 400 })
+  const userParam    = req.nextUrl.searchParams.get('user')
+  if (!tokenIdParam || !userParam) {
+    return NextResponse.json({ error: 'Missing params' }, { status: 400 })
   }
 
   const tokenId = BigInt(tokenIdParam)
+  const user    = userParam as `0x${string}`
+
   const result = (await client.readContract({
     address: TOMAGOTCHU_CONTRACT.address,
-    abi: TOMAGOTCHU_CONTRACT.abi,
+    abi:     TOMAGOTCHU_CONTRACT.abi,
     functionName: 'generateTraits',
-    args: [tokenId, user as `0x${string}`],
+    args: [tokenId, user],
   })) as [number, number, number]
 
   const [color, shape, animal] = result
