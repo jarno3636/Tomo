@@ -1,12 +1,12 @@
-// app/api/frame/[id]/route.tsx
-import { ImageResponse } from '@/lib/vercelOg'
+// app/api/frame/[id]/route.ts
+import { ImageResponse } from '@vercel/og'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
 
 export const runtime = 'edge'
 
 export async function GET(
-  req: Request,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
   const tokenId = parseInt(params.id, 10)
@@ -16,8 +16,10 @@ export async function GET(
 
   const traits = getTraits(tokenId)
   const svg = generateImage(traits)
-  const base64 = Buffer.from(svg).toString('base64')
-  const imageUrl = `data:image/svg+xml;base64,${base64}`
+
+  // turn the SVG into a data-URI so <img> can render it
+  const svgBase64 = Buffer.from(svg).toString('base64')
+  const imageUrl = `data:image/svg+xml;base64,${svgBase64}`
 
   return new ImageResponse(
     (
@@ -26,20 +28,20 @@ export async function GET(
           width: '100%',
           height: '100%',
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#fff',
+          backgroundColor: '#ffffff',
           fontFamily: 'monospace',
-          flexDirection: 'column',
         }}
       >
         <img
           src={imageUrl}
-          width="200"
-          height="200"
+          width={200}
+          height={200}
           alt={`Tomagotchu #${tokenId}`}
         />
-        <p style={{ fontSize: 24, marginTop: 20 }}>
+        <p style={{ marginTop: 20, fontSize: 24 }}>
           Tomagotchu #{tokenId}
         </p>
       </div>
