@@ -1,3 +1,5 @@
+// lib/traits.ts
+
 export type TraitInfo = {
   name: string
   rarity: 'Common' | 'Rare' | 'Legendary'
@@ -14,7 +16,7 @@ const colorTraits: TraitInfo[] = [
   { name: 'Red', rarity: 'Rare', hex: '#EF4444' },
   { name: 'Purple', rarity: 'Rare', hex: '#8B5CF6' },
   { name: 'Teal', rarity: 'Rare', hex: '#14B8A6' },
-  { name: 'Rainbow', rarity: 'Legendary', hex: 'url(#rainbow)' }
+  { name: 'Rainbow', rarity: 'Legendary', hex: 'url(#rainbow)' },
 ]
 
 const shapeTraits: TraitInfo[] = [
@@ -27,7 +29,7 @@ const shapeTraits: TraitInfo[] = [
   { name: 'Diamond', rarity: 'Rare', hex: '#000000' },
   { name: 'Spiral', rarity: 'Rare', hex: '#000000' },
   { name: 'Hexagon', rarity: 'Rare', hex: '#000000' },
-  { name: 'Crystal', rarity: 'Legendary', hex: '#000000' }
+  { name: 'Crystal', rarity: 'Legendary', hex: '#000000' },
 ]
 
 const animalTraits: TraitInfo[] = [
@@ -40,4 +42,20 @@ const animalTraits: TraitInfo[] = [
   { name: 'Fox', rarity: 'Rare', hex: '#000000' },
   { name: 'Panda', rarity: 'Rare', hex: '#000000' },
   { name: 'Penguin', rarity: 'Rare', hex: '#000000' },
-  { name: 'Dragon', rarity: 'Legendary', hex: '#000000'
+  { name: 'Dragon', rarity: 'Legendary', hex: '#000000' },
+]
+
+export function getTraits(tokenId: number) {
+  const seed = tokenId + 1337
+
+  function getIndex(seed: number, offset: number): number {
+    const hash = (BigInt(seed) * BigInt(offset + 1)) % BigInt(10)
+    return Number(hash)
+  }
+
+  return {
+    color: colorTraits[getIndex(seed, 0)],
+    shape: shapeTraits[getIndex(seed, 1)],
+    animal: animalTraits[getIndex(seed, 2)],
+  }
+}
