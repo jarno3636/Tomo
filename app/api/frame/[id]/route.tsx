@@ -1,5 +1,5 @@
 // app/api/frame/[id]/route.tsx
-import { ImageResponse } from '@vercel/og'
+import { ImageResponse } from '@/lib/vercelOg'
 import { getTraits } from '@/lib/traits'
 import { generateImage } from '@/lib/generateImage'
 
