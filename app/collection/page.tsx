@@ -1,13 +1,14 @@
-// app/collection/page.tsx
 'use client'
 
 import { useAccount } from 'wagmi'
 import { useEffect, useState } from 'react'
-import { readContract } from '@wagmi/core'
-import { publicClient } from '@/lib/wagmi'
+import { getPublicClient } from '@wagmi/core'
 import Image from 'next/image'
-import TomagotchuABI from '@/lib/TomagotchuABI'
-import { CONTRACT_ADDRESS } from '@/lib/constants'
+
+import { TomagotchuABI, CONTRACT_ADDRESS } from '@/lib/constants' // if you moved ABI here
+// or if you kept it in its own file:
+// import TomagotchuABI from '@/lib/TomagotchuABI'
+import { getTraits } from '@/lib/traits'
 
 type NFT = {
   tokenId: number
@@ -17,45 +18,45 @@ type NFT = {
 
 export default function CollectionPage() {
   const { address, isConnected } = useAccount()
-  const [nfts, setNfts]       = useState<NFT[]>([])
+  const [nfts, setNfts] = useState<NFT[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (!isConnected || !address) return
-    setLoading(true)
+    const client = getPublicClient()
     ;(async () => {
+      setLoading(true)
       const results: NFT[] = []
       for (let tokenId = 0; tokenId < 10000; tokenId++) {
         try {
-          const owner = await readContract(publicClient, {
+          const owner = await client.readContract({
             address: CONTRACT_ADDRESS,
-            abi:     TomagotchuABI,
+            abi: TomagotchuABI,
             functionName: 'ownerOf',
             args: [BigInt(tokenId)],
           })
-          if (String(owner).toLowerCase() === address.toLowerCase()) {
-            const [color, shape, animal] = (await readContract(publicClient, {
+          if ((owner as string).toLowerCase() === address.toLowerCase()) {
+            const [c, s, a] = (await client.readContract({
               address: CONTRACT_ADDRESS,
-              abi:     TomagotchuABI,
+              abi: TomagotchuABI,
               functionName: 'generateTraits',
-              args: [BigInt(tokenId), address as `0x${string}`],
+              args: [BigInt(tokenId), address],
             })) as [number, number, number]
 
             const getRarity = (t: number) =>
               t < 6 ? 'common' : t < 9 ? 'rare' : 'legendary'
-
             results.push({
               tokenId,
-              traits: { color, shape, animal },
+              traits: { color: c, shape: s, animal: a },
               rarity: {
-                color: getRarity(color),
-                shape: getRarity(shape),
-                animal: getRarity(animal),
+                color: getRarity(c),
+                shape: getRarity(s),
+                animal: getRarity(a),
               },
             })
           }
         } catch {
-          // skip missing tokens
+          // token doesn't exist or error
         }
       }
       setNfts(results)
@@ -64,6 +65,48 @@ export default function CollectionPage() {
   }, [address, isConnected])
 
   return (
-    <div>…same UI as before…</div>
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4">🎒 My Tomagotchus</h1>
+      {!isConnected ? (
+        <p className="text-gray-500">Connect your wallet to view your NFTs.</p>
+      ) : loading ? (
+        <p>Loading your collection...</p>
+      ) : nfts.length === 0 ? (
+        <p>No Tomagotchus found in your wallet.</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {nfts.map((nft) => (
+            <div
+              key={nft.tokenId}
+              className="border rounded-lg p-4 bg-white/10 backdrop-blur shadow"
+            >
+              <div className="mb-2 font-semibold">
+                Token #{nft.tokenId}
+              </div>
+              <div className="text-sm space-y-1">
+                <div>
+                  🎨 Color: {nft.traits.color}{' '}
+                  <span className="ml-2">
+                    {nft.rarity.color}
+                  </span>
+                </div>
+                <div>
+                  🔷 Shape: {nft.traits.shape}{' '}
+                  <span className="ml-2">
+                    {nft.rarity.shape}
+                  </span>
+                </div>
+                <div>
+                  🐾 Animal: {nft.traits.animal}{' '}
+                  <span className="ml-2">
+                    {nft.rarity.animal}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
