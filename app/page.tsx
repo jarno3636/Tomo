@@ -1,8 +1,8 @@
+// app/page.tsx
 'use client'
 
 import { useState } from 'react'
 import { useAccount, useConnect } from 'wagmi'
-import { injected, walletConnect } from 'wagmi/connectors'
 import MintButton from '@/components/MintButton'
 import TraitReveal from '@/components/TraitReveal'
 
@@ -13,12 +13,9 @@ export default function HomePage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
       <h1 className="text-3xl font-bold mb-4">🐸 Tomagotchu</h1>
-
-      {!isConnected ? (
-        <Connect />
-      ) : (
+      {!isConnected ? <Connect /> : (
         <>
-          <MintButton onMint={(id: number) => setTokenId(id)} />
+          <MintButton onMint={setTokenId} />
           {tokenId !== null && <TraitReveal tokenId={tokenId} />}
         </>
       )}
@@ -27,23 +24,20 @@ export default function HomePage() {
 }
 
 function Connect() {
-  const { connect, connectors, error, isLoading } = useConnect({
-    connectors: [injected(), walletConnect({ projectId: '8d389a211728bfed10834a260898662e' })],
-  })
-
+  const { connect, connectors, error, isLoading } = useConnect()
   return (
     <div className="space-x-2">
-      {connectors.map((connector) => (
+      {connectors.map((c) => (
         <button
-          key={connector.id}
-          disabled={!connector.ready || isLoading}
-          onClick={() => connect({ connector })}
+          key={c.id}
+          disabled={!c.ready || isLoading}
+          onClick={() => connect({ connector: c })}
           className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
         >
-          {connector.name}
+          {c.name}{!c.ready && ' (unsupported)'}
         </button>
       ))}
-      {error && <p className="text-red-500 mt-2">{error.message}</p>}
+      {error && <p className="mt-2 text-red-500">{error.message}</p>}
     </div>
   )
 }
